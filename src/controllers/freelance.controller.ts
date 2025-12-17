@@ -56,3 +56,32 @@ export const getFreelanceById = async (
     }
 };
 
+export const getCompatibleProjets = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) : Promise<any> => {
+    try {
+        const { id } = req.params;
+        const freelance = await prisma.freelance.findUnique({
+            where: { id: parseInt(id) }
+        });
+        if (!freelance) {
+            return res.status(404).json({ message: 'Freelance non trouvé.' });
+        }
+        const freelanceSkillsLower = freelance.skills.map(skill => skill.toLowerCase());
+        const projets = await prisma.projet.findMany();
+        const FreelanceCompatibleProjets = projets.filter(projet => {
+            const projetSkillsLower = projet.skillsRequis.map(skill => skill.toLowerCase());
+            const hasAllSkills = projetSkillsLower.every(skill => freelanceSkillsLower.includes(skill))
+            return hasAllSkills;
+        });
+
+        if (FreelanceCompatibleProjets.length === 0) {
+            return res.status(404).json({ message: 'Aucun projet compatible trouvé pour ce freelance.' });
+        }
+        res.status(200).json(FreelanceCompatibleProjets);
+    } catch (error) {
+        next(error);
+    }  
+};

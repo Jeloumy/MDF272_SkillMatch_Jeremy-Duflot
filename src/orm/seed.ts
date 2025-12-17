@@ -19,7 +19,7 @@ const freelances = [
     {
         nom: "Charlie Expert",
         email: "charlie@skillmatch.com",
-        skills: ["Python", "FastAPI"],
+        skills: ["python", "fastapi"],
         tjm: 600
     }
 ];
