@@ -42,9 +42,9 @@ export const getFreelanceById = async (
     next: NextFunction
 ) : Promise<any> => {
     try {
-        const {id} = req.params;
+        const { fId } = req.params;
         const freelance = await prisma.freelance.findUnique({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(fId) }
         });
 
         if(!freelance) {
@@ -62,9 +62,9 @@ export const getCompatibleProjets = async (
     next: NextFunction
 ) : Promise<any> => {
     try {
-        const { id } = req.params;
+        const { fId } = req.params;
         const freelance = await prisma.freelance.findUnique({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(fId) }
         });
         if (!freelance) {
             return res.status(404).json({ message: 'Freelance non trouvé.' });
@@ -84,4 +84,46 @@ export const getCompatibleProjets = async (
     } catch (error) {
         next(error);
     }  
+};
+
+export const postulerProjet = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) : Promise<any> => {
+    try {
+        const { fId, pId } = req.params;
+        const freelanceId = parseInt(fId);
+        const projetId = parseInt(pId);
+        const freelance = await prisma.freelance.findUnique({
+            where: { id: freelanceId }
+        });
+        const projet = await prisma.projet.findUnique({
+            where: { id: projetId }
+        });
+        if (!freelance) {
+            return res.status(404).json({ message: 'Freelance non trouvé.' });
+        }
+        if (!projet) {
+            return res.status(404).json({ message: 'Projet non trouvé.' });
+        }
+        const freelanceSkillsLower = freelance.skills.map(skill => skill.toLowerCase());
+        const projetSkillsLower = projet.skillsRequis.map(skill => skill.toLowerCase());
+        const hasAllSkills = projetSkillsLower.every(skill => freelanceSkillsLower.includes(skill));
+
+        if (!hasAllSkills) {
+            return res.status(400).json({ resultat: "Candidature REFUSÉE", motif: "Compétences manquantes", skills_freelance: freelance.skills, skills_requises: projet.skillsRequis
+            });
+        }
+
+        if (freelance.tjm > projet.budgetMaxTjm) {
+            return res.status(400).json({ resultat: "Candidature REFUSÉE", motif: "TJM trop élevé", tjm_freelance: freelance.tjm, budget_max_projet: projet.budgetMaxTjm
+            });
+        }
+
+        return res.status(200).json({ resultat: "Candidature ACCEPTÉE", motif: "Le freelance répond aux critères du projet", freelance : freelance.nom, projet: projet.titre});
+
+    } catch (error) {
+        next(error);
+    }
 };

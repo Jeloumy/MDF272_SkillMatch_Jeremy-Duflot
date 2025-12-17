@@ -1,4 +1,5 @@
-@id=3
+@fId=1
+@pId=1
 
 ### Test de la route principale (V1)
 GET http://localhost:8000/v1/
@@ -20,7 +21,10 @@ Content-Type: application/json
 }
 
 ### Test recherche de freelances par ID
-GET http://localhost:8000/v1/freelances/{{id}}
+GET http://localhost:8000/v1/freelances/{{fId}}
 
 ### Test recherche de projets par skills du freelance
-GET http://localhost:8000/v1/freelances/{{id}}/projets-compatibles
+GET http://localhost:8000/v1/freelances/{{fId}}/projets-compatibles
+
+### Test de la candidature à un projet
+POST http://localhost:8000/v1/freelances/{{fId}}/postuler/{{pId}}

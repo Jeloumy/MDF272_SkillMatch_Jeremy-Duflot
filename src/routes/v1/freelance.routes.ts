@@ -1,12 +1,13 @@
 import { Router } from "express";
-import { createFreelance, getAllFreelances, getCompatibleProjets, getFreelanceById } from "../../controllers/freelance.controller";
+import { createFreelance, getAllFreelances, getCompatibleProjets, getFreelanceById, postulerProjet } from "../../controllers/freelance.controller";
 
 const router = Router();
 
 router.get('/', getAllFreelances);
-router.get('/:id', getFreelanceById);
+router.get('/:fId', getFreelanceById);
 router.post('/create', createFreelance);
-router.get('/:id/projets-compatibles', getCompatibleProjets);
+router.get('/:fId/projets-compatibles', getCompatibleProjets);
+router.post('/:fId/postuler/:pId', postulerProjet);
 
 export { router as freelanceRoute };
 
