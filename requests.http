@@ -7,7 +7,7 @@ GET http://localhost:8000/v1/freelances
 Content-Type: application/json
 
 ### Test de la création d'un freelance
-POST http://localhost:8000/v1/freelances
+POST http://localhost:8000/v1/freelances/create
 Content-Type: application/json
 
 {
@@ -16,3 +16,6 @@ Content-Type: application/json
     "skills": ["JavaScript", "TypeScript", "Node.js"],
     "tjm": 450
 }
+
+### Test recherche de freelances par ID
+GET http://localhost:8000/v1/freelances/3

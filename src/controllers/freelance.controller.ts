@@ -4,7 +4,7 @@ import { prisma } from "../orm/client";
 import { FreelancePayload, CreateFreelanceDtoInputs } from '../dtos/freelance.dto';
 
 
-export const getAllFreelances = async (req: Request, res: Response, next: NextFunction) => {
+export const getAllFreelances = async (req: Request, res: Response, next: NextFunction) : Promise<any> => {
     try {
         const freelances: FreelancePayload[] = await prisma.freelance.findMany();
         res.status(200).json(freelances);
@@ -14,7 +14,7 @@ export const getAllFreelances = async (req: Request, res: Response, next: NextFu
     }
 }; 
 
-export const createFreelance = async (req: Request, res: Response, next: NextFunction) => {
+export const createFreelance = async (req: Request, res: Response, next: NextFunction) : Promise<any> => {
     try {
         const body = req.body as CreateFreelanceDtoInputs; 
         const existingFreelance = await prisma.freelance.findUnique({
@@ -35,3 +35,24 @@ export const createFreelance = async (req: Request, res: Response, next: NextFun
         next();
     }   
 };
+
+export const getFreelanceById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) : Promise<any> => {
+    try {
+        const {id} = req.params;
+        const freelance = await prisma.freelance.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if(!freelance) {
+            return res.status(404).json({ message: 'Freelance non trouvé.' });
+        }
+        res.status(200).json((freelance));
+    } catch (error) {
+        next(error);
+    }
+};
+
