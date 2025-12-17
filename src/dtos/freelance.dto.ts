@@ -5,3 +5,10 @@ export interface FreelancePayload {
     skills: string[];
     tjm: number;
 }
+
+export interface CreateFreelanceDtoInputs {
+    nom: string;
+    email: string;
+    skills: string[];
+    tjm: number;
+}

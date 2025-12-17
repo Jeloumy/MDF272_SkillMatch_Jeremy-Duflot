@@ -5,3 +5,14 @@ Content-Type: application/json
 ### Test de la route all freelances
 GET http://localhost:8000/v1/freelances
 Content-Type: application/json
+
+### Test de la création d'un freelance
+POST http://localhost:8000/v1/freelances
+Content-Type: application/json
+
+{
+    "nom": "Duflot",
+    "email": "jeremy.duflot@example.com",
+    "skills": ["JavaScript", "TypeScript", "Node.js"],
+    "tjm": 450
+}
