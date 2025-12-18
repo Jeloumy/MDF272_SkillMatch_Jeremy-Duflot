@@ -99,7 +99,7 @@ export const getProjetsByEntreprise = async (
     }       
 };
 
-export const getCandidatsCompatibles = async (
+export const getFreelancesCompatibles = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -121,9 +121,74 @@ export const getCandidatsCompatibles = async (
         });
 
         if (candidatsCompatibles.length === 0) {
-            return res.status(404).json({ message: 'Aucun candidat compatible trouvé pour ce projet.' });
+            return res.status(404).json({ message: 'Aucun freelance compatible trouvé pour ce projet.' });
         }
         res.status(200).json(candidatsCompatibles);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getFreelancesScoreCompatibles = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<any> => {
+    try {
+        const { pId } = req.params;
+        const { filterByBudget } = req.query;
+        const projet = await prisma.projet.findUnique({
+            where: { id: parseInt(pId) }
+        });
+
+        if (!projet) {
+            return res.status(404).json({ message: 'Projet non trouvé.' });
+        }
+
+        
+        const freelances = await prisma.freelance.findMany({
+            select: {
+                id: true,
+                nom: true,
+                email: true,
+                skills: true,
+                tjm: true
+            }
+        });
+        
+        let freelancesEligibles = freelances;
+
+        if (filterByBudget === 'true') {
+            freelancesEligibles = freelances.filter(freelance => {
+                return freelance.tjm <= projet.budgetMaxTjm;
+            });
+        }
+
+        const projetSkillsLower = projet.skillsRequis.map(skill => skill.toLowerCase());
+        const freelancesWithScore = freelancesEligibles.map(freelance => {
+        const freelanceSkillsLower = freelance.skills.map(skill => skill.toLowerCase());
+            
+        const skillsCommuns = projetSkillsLower.filter(skillReq => freelanceSkillsLower.includes(skillReq));
+
+        const scoreValue = projetSkillsLower.length > 0 ? (skillsCommuns.length / projetSkillsLower.length) * 100 : 0;
+
+        return {
+             ...freelance,
+            scoreCompatible: `${Math.round(scoreValue)}%`, 
+            scoreValue: scoreValue,                        
+            skillsCommuns: skillsCommuns
+            };
+        });
+
+        const allScores = freelancesWithScore.map(freelance => freelance.scoreValue);
+        const maxScore = allScores.length > 0 ? Math.max(...allScores) : 0;
+
+        const meilleursFreelances = freelancesWithScore.filter(freelance => freelance.scoreValue === maxScore && freelance.scoreValue > 0);
+
+        const autresFreelances = freelancesWithScore.filter(freelance => freelance.scoreValue < maxScore || maxScore === 0).sort((a, b) => b.scoreValue - a.scoreValue);
+
+        res.status(200).json({projet: projet.titre, skills_requis: projet.skillsRequis, budget_max_projet: projet.budgetMaxTjm, filtre_budget_actif: filterByBudget === 'true', meilleurs_freelances: meilleursFreelances.map(({ scoreValue, ...reste }) => reste), autres_freelances: autresFreelances.map(({ scoreValue, ...reste }) => reste)});
+
     } catch (error) {
         next(error);
     }

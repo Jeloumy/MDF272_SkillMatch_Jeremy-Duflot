@@ -28,5 +28,12 @@ GET http://localhost:8000/v1/freelances/{{fId}}
 ### Test recherche de projets par skills du freelance
 GET http://localhost:8000/v1/freelances/{{fId}}/projets-compatibles
 
+### Test recherche de projets compatibles pour un freelance (score skills)
+GET http://localhost:8000/v1/freelances/{{fId}}/projets-compatibles-score
+
+### Test recherche de projets compatibles pour un freelance (score skills) et filtre budget
+GET http://localhost:8000/v1/freelances/{{fId}}/projets-compatibles-score?filterByBudget=true
+
 ### Test de la candidature à un projet
 POST http://localhost:8000/v1/freelances/{{fId}}/postuler/{{pId}}
+

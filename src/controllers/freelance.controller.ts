@@ -140,3 +140,53 @@ export const postulerProjet = async (
         next(error);
     }
 };
+
+export const getProjetsScoreCompatibles = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) : Promise<any> => {
+    try {
+        const { fId } = req.params;
+        const { filterByBudget } = req.query;
+        const freelance = await prisma.freelance.findUnique({
+            where: { id: parseInt(fId) }
+        });
+        if (!freelance) {
+            return res.status(404).json({ message: 'Freelance non trouvé.' });
+        }
+        const freelanceSkillsLower = freelance.skills.map(skill => skill.toLowerCase());
+        const projets = await prisma.projet.findMany();
+        let projetsEligibles = projets;
+
+        if (filterByBudget === 'true') {
+            projetsEligibles = projets.filter(projet => {
+                return projet.budgetMaxTjm >= freelance.tjm;
+            });
+        }
+
+        const projetsWithScore = projetsEligibles.map(projet => {
+        const projetSkillsLower = projet.skillsRequis.map(skill => skill.toLowerCase());
+        const skillsCommuns = projetSkillsLower.filter(skillReq =>
+            freelanceSkillsLower.includes(skillReq)
+            );
+            
+            const scoreValue = projetSkillsLower.length > 0 ? (skillsCommuns.length / projetSkillsLower.length) * 100 : 0;
+
+            return {
+                ...projet,
+                scoreCompatible: `${Math.round(scoreValue)}%`,
+                scoreValue: scoreValue,
+                skillsCommuns: skillsCommuns
+            };
+        });
+
+        const allScores = projetsWithScore.map(projet => projet.scoreValue);
+        const maxScore = allScores.length > 0 ? Math.max(...allScores) : 0;
+        const meilleursProjets = projetsWithScore.filter(projet => projet.scoreValue === maxScore && projet.scoreValue > 0);
+        const autresProjets = projetsWithScore.filter(projet => projet.scoreValue < maxScore || maxScore === 0).sort((a, b) => b.scoreValue - a.scoreValue);
+        res.status(200).json({freelance: freelance.nom, tjm_actuel: freelance.tjm, filtre_budget_actif: filterByBudget === 'true', meilleurs_projets: meilleursProjets.map(({ scoreValue, ...reste }) => reste), autres_projets: autresProjets.map(({ scoreValue, ...reste }) => reste)});
+    } catch (error) {
+        next(error);
+    }
+};

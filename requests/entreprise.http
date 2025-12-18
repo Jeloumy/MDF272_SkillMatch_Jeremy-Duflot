@@ -18,16 +18,22 @@ GET http://localhost:8000/v1/entreprises/3
 GET http://localhost:8000/v1/entreprises/1/projets
 
 ### Test création d'un projet par entreprise
-POST http://localhost:8000/v1/entreprises/1/create-projets
+POST http://localhost:8000/v1/entreprises/2/create-projets
 Content-Type: application/json
 
 {
     "titre": "Développement d'une application mobile",
     "description": "Créer une application mobile pour la gestion des tâches.",
     "skillsRequis": ["Flutter", "Dart", "Firebase"],
-    "budgetMaxTjm": 800
+    "budgetMaxTjm": 300
 }
 
-### Test recherche de freelances compatibles pour un projet
-GET http://localhost:8000/v1/entreprises/1/projets/1/candidatscompatibles
+### Test recherche de freelances compatibles pour un projet (strict sur les skills) 
+GET http://localhost:8000/v1/entreprises/1/projets/1/freelances-compatibles
+
+### Test recherche de freelances compatibles pour un projet (score skills)
+GET http://localhost:8000/v1/entreprises/1/projets/1/freelances-compatibles-score
+
+### Test recherche de freelances compatibles pour un projet (score skills) et filtre budget
+GET http://localhost:8000/v1/entreprises/1/projets/1/freelances-compatibles-score?filterByBudget=true
 
