@@ -5,6 +5,12 @@
 GET http://localhost:8000/v1/freelances
 Content-Type: application/json
 
+### 1 Skill (Python)
+GET http://localhost:8000/v1/freelances?skills=python
+
+### Plusieurs Skills (Python ET Django)
+GET http://localhost:8000/v1/freelances?skills=Python,Django
+
 ### Test de la création d'un freelance
 POST http://localhost:8000/v1/freelances/create
 Content-Type: application/json

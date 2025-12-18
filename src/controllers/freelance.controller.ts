@@ -6,8 +6,21 @@ import { FreelancePayload, CreateFreelanceDtoInputs } from '../dtos/freelance.dt
 
 export const getAllFreelances = async (req: Request, res: Response, next: NextFunction) : Promise<any> => {
     try {
+
+        const {skills} = req.query;
         const freelances: FreelancePayload[] = await prisma.freelance.findMany();
-        res.status(200).json(freelances);
+
+        if (!skills) {
+            return res.status(200).json(freelances);
+        }
+
+        const skillsArray = (skills as string).split(',').map(s => s.trim().toLowerCase());
+        const filteredFreelances = freelances.filter(freelance => {
+            const freelanceSkillsLower = freelance.skills.map(skill => skill.toLowerCase());
+            return skillsArray.every(skill => freelanceSkillsLower.includes(skill));
+        });
+
+        res.status(200).json(filteredFreelances);
     } catch (error) {
         res.status(500).json({ message: 'Erreur serveur lors de la récupération des freelances.' });
         next();
