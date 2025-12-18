@@ -1,0 +1,33 @@
+### Test de la route all entreprises
+GET http://localhost:8000/v1/entreprises
+Content-Type: application/json
+
+### Test de la route create entreprise
+POST http://localhost:8000/v1/entreprises/create
+Content-Type: application/json
+
+{
+    "nom": "La D Tech",
+    "secteur": "Informatique"
+}
+
+### Test recherche d'une entreprise par ID
+GET http://localhost:8000/v1/entreprises/3
+
+### Test recherche de projets par entreprise
+GET http://localhost:8000/v1/entreprises/1/projets
+
+### Test création d'un projet par entreprise
+POST http://localhost:8000/v1/entreprises/1/create-projets
+Content-Type: application/json
+
+{
+    "titre": "Développement d'une application mobile",
+    "description": "Créer une application mobile pour la gestion des tâches.",
+    "skillsRequis": ["Flutter", "Dart", "Firebase"],
+    "budgetMaxTjm": 800
+}
+
+### Test recherche de freelances compatibles pour un projet
+GET http://localhost:8000/v1/entreprises/1/projets/1/candidatscompatibles
+
