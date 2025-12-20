@@ -1,0 +1,2 @@
+### Récupérer les projets ouverts (Public)
+GET http://localhost:8000/v1/projets/ouverts

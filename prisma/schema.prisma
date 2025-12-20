@@ -36,6 +36,8 @@ model Projet {
   description  String
   skillsRequis String[]
   budgetMaxTjm Int
+
+  statut         StatutProjet @default(OUVERT)
   
   entrepriseId Int
   entreprise   Entreprise @relation(fields: [entrepriseId], references: [id])
@@ -44,3 +46,9 @@ model Projet {
   freelance   Freelance? @relation(fields: [freelanceId], references: [id])
 }
 
+enum StatutProjet {
+  OUVERT
+  EN_COURS
+  TERMINE
+  ANNULE
+}
